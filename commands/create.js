@@ -30,44 +30,54 @@ module.exports = function create(message, o, cb) {
     self.commands.list.call(self, { silent: true }, function(er, files) {
       if(er) return cb(er);
 
-      var id = files.map(function(issue) {
+      var currentMaxId = files.map(function(issue) {
         return parseInt(issue.id.replace(/^#/, ''), 10);
       }).reduce(function(a, b) {
         return a > b ? a : b;
-      }, 0) + 1;
+      }, 0);
 
-      if(message) return next(id, title, message, cb);
+      self.list('closed', { silent: true }, function (er, files) {
+        currentMaxId = files.map(function(issue) {
+          return parseInt(issue.id.replace(/^#/, ''), 10);
+        }).reduce(function(a, b) {
+          return a > b ? a : b;
+        }, currentMaxId);
 
-      if(!message) return fs.writeFile(self.path('.edit'), '', function(er) {
-        if(er) return cb(er);
-        self.editor(function(er, body) {
+        var id = currentMaxId + 1;
+
+        if(message) return next(id, title, message, cb);
+
+        if(!message) return fs.writeFile(self.path('.edit'), '', function(er) {
           if(er) return cb(er);
-          next(id, title, body, cb);
-        });
-      });
-
-      function next(id, title, message, cb) {
-        if(!cb) cb = message, message = '';
-        message = message || title;
-
-        var slug = self.slug(title),
-          filename = id + '-' + slug + '.md',
-          filepath = self.path(filename);
-
-        var content = [
-          '## #'+ id + ' - '  + title,
-          '',
-          message
-        ].join('\n');
-
-        fs.writeFile(filepath, content, function(er) {
-          if(er) return cb(er);
-          self.git.add(filename, function(er) {
+          self.editor(function(er, body) {
             if(er) return cb(er);
-            self.git.commit(message, cb);
+            next(id, title, body, cb);
           });
         });
-      }
+
+        function next(id, title, message, cb) {
+          if(!cb) cb = message, message = '';
+          message = message || title;
+
+          var slug = self.slug(title),
+            filename = id + '-' + slug + '.md',
+            filepath = self.path(filename);
+
+          var content = [
+            '## #'+ id + ' - '  + title,
+            '',
+            message
+          ].join('\n');
+
+          fs.writeFile(filepath, content, function(er) {
+            if(er) return cb(er);
+            self.git.add(filename, function(er) {
+              if(er) return cb(er);
+              self.git.commit(message, cb);
+            });
+          });
+        }
+      });  
     });
   });
 

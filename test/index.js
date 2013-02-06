@@ -57,7 +57,23 @@ gb.and(function() {
 
     gb.get(807987, error('get', 'No issue #807987'));
 
-    gb.close(1, next('close', 'Close #1'));
+    gb.close(1, next('close', 'Close #1')).and(function () {
+            title = 'This is another new issue';
+            gb.and(function () {
+                gb.create('This is another new issue', { title: title, desc: title }, next('create another new issue', 'This is another new issue')).and(function () {
+                    gb.list(next('New issue id is greater than deleted issue id')).and(function (er, files) {
+                        assert.ifError(er);
+                        assert.equal(files.length, 1, 'Creating another new issue should show 1 issue in list');
+                        var issue = files[0];
+
+                        assert.equal(issue.id, '#2', 'New issue id shoud be greater than deleted issue id');
+                        assert.equal(issue.file, '2-this-is-another-new-issue.md');
+                        assert.equal(issue.title.trim(), 'This is another new issue');
+                    });
+                })
+            });
+
+        });
   });
 });
 
