@@ -16,7 +16,7 @@ assert.equal(gb.path(), path.resolve('.test/.gitbugs'));
 
 gb.init(next('init', [
   /initialized\s(existing|empty)?\sGit\srepository\sin/i,
-  'in /Users/mk/Temp/dev/mklabs/gitbugs/.test/.gitbugs/.git/'
+  'in '+path.resolve()+'/.test/.gitbugs/.git/'
 ]));
 
 gb.on('error', function(er) { console.error(er); });
