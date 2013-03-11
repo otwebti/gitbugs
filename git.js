@@ -38,7 +38,7 @@ function Git(cmd, o, cb) {
 
   // check a few things.
   // should be called from within a git repo
-  if(!path.existsSync(path.resolve(this.cwd, '.git'))) {
+  if(!fs.existsSync(path.resolve(this.cwd, '.git'))) {
     this.emit('error', new Error(this.cwd + ' is not a git repo.'));
   }
 }

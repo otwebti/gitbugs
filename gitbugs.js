@@ -189,7 +189,7 @@ GitBugs.prototype.path = function() {
 GitBugs.prototype.resolve = function resolve(base) {
   base = base || process.cwd();
   var git = path.resolve(base, '.git');
-  if(path.existsSync(git)) {
+  if(fs.existsSync(git)) {
     return path.dirname(git);
   }
   return resolve(path.dirname(base));
