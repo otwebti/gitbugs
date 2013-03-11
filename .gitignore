@@ -1,2 +1,7 @@
 .gitbugs
+.idea
+gitbugs.iml
 node_modules
+sublime-project*
+.project
+.buildpath
